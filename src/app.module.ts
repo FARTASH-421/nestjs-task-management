@@ -12,7 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       password: 'admin',
       database: 'task-management',
       autoLoadEntities: true,
-      synchronize: true,  
+      synchronize: true,
     }),
   ],
   controllers: [],

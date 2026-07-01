@@ -13,9 +13,23 @@ export class TasksService {
     private readonly taskRepository: Repository<Task>,
   ) {}
 
-  // getAllTasks(): Task[] {
-  //   return this.tasks;
-  // }
+  async getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+    const { status, search } = filterDto;
+    const query = this.taskRepository.createQueryBuilder('task');
+    if (status) {
+      query.andWhere('task.status = :status', { status });
+    }
+
+    if (search) {
+      query.andWhere(
+        'LOWER(task.title) LIKE LOWER(:search) OR LOWER(task.description) LIKE LOWER(:search)',
+        { search: `%${search}%` },
+      );
+    }
+    const task = query.getMany();
+
+    return task;
+  }
 
   async getTaskById(id: string): Promise<Task> {
     const found = await this.taskRepository.findOneBy({ id });
@@ -25,29 +39,6 @@ export class TasksService {
 
     return found;
   }
-
-  // getTasksWithFilters(filterDto: GetTasksFilterDto): Task[] {
-  //   const { status, search } = filterDto;
-  //   let tasks = this.getAllTasks();
-  //   // do semthing to status
-  //   if (status) {
-  //     tasks = tasks.filter((task) => task.status === status);
-  //   }
-  //   // do semthing to search
-  //   if (search) {
-  //     tasks = tasks.filter((task) => {
-  //       if (
-  //         task.title.toLocaleLowerCase().includes(search) ||
-  //         task.description.toLocaleLowerCase().includes(search)
-  //       ) {
-  //         return true;
-  //       } else {
-  //         return false;
-  //       }
-  //     });
-  //   }
-  //   return tasks;
-  // }
 
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
     const { title, description } = createTaskDto;
@@ -60,18 +51,6 @@ export class TasksService {
     await this.taskRepository.save(task);
     return task;
   }
-
-  // createTask(createTaskDto: CreateTaskDto): Task {
-  //   const { title, description } = createTaskDto;
-  //   const task: Task = {
-  //     id: uuid(),
-  //     title,
-  //     description,
-  //     status: TaskStatus.OPEN,
-  //   };
-  //   this.tasks.push(task);
-  //   return task;
-  // }
 
   async deleteTask(id: string): Promise<void> {
     const result = await this.taskRepository.delete({ id });

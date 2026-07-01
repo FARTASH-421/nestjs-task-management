@@ -19,14 +19,10 @@ import { Task } from './task.entity';
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
-  // @Get()
-  // getTasks(@Query() fliterDto: GetTasksFilterDto): Task[] {
-  //   if (Object.keys(fliterDto).length) {
-  //     return this.tasksService.getTasksWithFilters(fliterDto);
-  //   } else {
-  //     return this.tasksService.getAllTasks();
-  //   }
-  // }
+  @Get()
+  getTasks(@Query() fliterDto: GetTasksFilterDto): Promise<Task[]> {
+    return this.tasksService.getTasks(fliterDto);
+  }
 
   @Get('/:id')
   getTaskById(@Param('id') id: string): Promise<Task> {
